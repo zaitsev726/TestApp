@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table
 public class Customer {
     @Id
     @GeneratedValue(generator = "customers_generator", strategy = GenerationType.SEQUENCE)
