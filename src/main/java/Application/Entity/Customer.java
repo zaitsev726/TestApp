@@ -1,8 +1,8 @@
 package Application.Entity;
 
-import jdk.jfr.Category;
-
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Customer {
@@ -17,19 +17,60 @@ public class Customer {
     @Column
     private String surname;
 
-    public Customer(){}
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Purchase> purchaseListForCustomer = new ArrayList<>();
 
-    public Integer getId_customer() { return id_customer; }
+    public void addPurchase(Purchase purchase) {
+        addPurchase(purchase, true);
+    }
 
-    public void setId_customer(Integer id_customer) { this.id_customer = id_customer; }
+    void addPurchase(Purchase purchase, boolean set) {
+        if (purchase != null) {
+            if (getPurchaseListForCustomer().contains(purchase)) {
+                purchaseListForCustomer.set(purchaseListForCustomer.indexOf(purchase), purchase);
+            } else
+                purchaseListForCustomer.add(purchase);
 
-    public String getName() { return name; }
+            if (set) {
+                purchase.setCustomer(this, false);
+            }
+        }
+    }
 
-    public void setName(String name) { this.name = name; }
+    public List<Purchase> getPurchaseListForCustomer() {
+        return purchaseListForCustomer;
+    }
 
-    public String getSurname() { return surname; }
+    public void setPurchaseListForCustomer(List<Purchase> purchaseListForCustomer) {
+        this.purchaseListForCustomer = purchaseListForCustomer;
+    }
 
-    public void setSurname(String surname) { this.surname = surname; }
+    public Customer() {
+    }
+
+    public Integer getId_customer() {
+        return id_customer;
+    }
+
+    public void setId_customer(Integer id_customer) {
+        this.id_customer = id_customer;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
 
     @Override
     public String toString() {

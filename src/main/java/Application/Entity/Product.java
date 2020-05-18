@@ -1,6 +1,8 @@
 package Application.Entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Product {
@@ -15,19 +17,60 @@ public class Product {
     @Column
     private float price;
 
-    public Product(){}
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<Purchase> purchaseListForProduct = new ArrayList<>();
 
-    public Integer getId_product() { return id_product; }
+    public void addPurchase(Purchase purchase) {
+        addPurchase(purchase, true);
+    }
 
-    public void setId_product(Integer id_product) { this.id_product = id_product; }
+    void addPurchase(Purchase purchase, boolean set) {
+        if (purchase != null) {
+            if (getPurchaseListForProduct().contains(purchase)) {
+                purchaseListForProduct.set(purchaseListForProduct.indexOf(purchase), purchase);
+            } else
+                purchaseListForProduct.add(purchase);
 
-    public String getProduct_title() { return product_title; }
+            if (set) {
+                purchase.setProduct(this, false);
+            }
+        }
+    }
 
-    public void setProduct_title(String product_title) { this.product_title = product_title; }
+    public List<Purchase> getPurchaseListForProduct() {
+        return purchaseListForProduct;
+    }
 
-    public float getPrice() { return price; }
+    public void setPurchaseListForProduct(List<Purchase> purchaseListForProduct) {
+        this.purchaseListForProduct = purchaseListForProduct;
+    }
 
-    public void setPrice(float price) { this.price = price; }
+    public Product() {
+    }
+
+    public Integer getId_product() {
+        return id_product;
+    }
+
+    public void setId_product(Integer id_product) {
+        this.id_product = id_product;
+    }
+
+    public String getProduct_title() {
+        return product_title;
+    }
+
+    public void setProduct_title(String product_title) {
+        this.product_title = product_title;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
 
     @Override
     public String toString() {

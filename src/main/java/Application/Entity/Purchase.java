@@ -19,23 +19,77 @@ public class Purchase {
     @Column
     private Date purchase_date;
 
-    public Purchase(){}
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    private Customer customer;
 
-    public Integer getId_purchase() { return id_purchase; }
+    public void setCustomer(Customer customer) {
+        setCustomer(customer, true);
+    }
 
-    public void setId_purchase(Integer id_purchase) { this.id_purchase = id_purchase; }
+    void setCustomer(Customer customer, boolean add) {
+        this.customer = customer;
+        if (customer != null && add){
+            customer.addPurchase(this, false);
+        }
+    }
 
-    public Integer getId_customer() { return id_customer; }
+    public Customer getCustomer() {
+        return customer;
+    }
 
-    public void setId_customer(Integer id_customer) { this.id_customer = id_customer; }
+    @ManyToOne(optional = false, cascade = CascadeType.ALL)
+    private Product product;
 
-    public Integer getId_product() { return id_product; }
+    public void setProduct(Product product) {
+        setProduct(product, true);
+    }
 
-    public void setId_product(Integer id_product) { this.id_product = id_product; }
+    void setProduct(Product product, boolean add) {
+        this.product = product;
+        if (product != null && add){
+            product.addPurchase(this, false);
+        }
+    }
 
-    public Date getPurchase_date() { return purchase_date; }
+    public Product getProduct() {
+        return product;
+    }
 
-    public void setPurchase_date(Date purchase_date) { this.purchase_date = purchase_date; }
+
+    public Purchase() {
+    }
+
+    public Integer getId_purchase() {
+        return id_purchase;
+    }
+
+    public void setId_purchase(Integer id_purchase) {
+        this.id_purchase = id_purchase;
+    }
+
+    public Integer getId_customer() {
+        return id_customer;
+    }
+
+    public void setId_customer(Integer id_customer) {
+        this.id_customer = id_customer;
+    }
+
+    public Integer getId_product() {
+        return id_product;
+    }
+
+    public void setId_product(Integer id_product) {
+        this.id_product = id_product;
+    }
+
+    public Date getPurchase_date() {
+        return purchase_date;
+    }
+
+    public void setPurchase_date(Date purchase_date) {
+        this.purchase_date = purchase_date;
+    }
 
     @Override
     public String toString() {
