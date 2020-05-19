@@ -1,32 +1,34 @@
 package Application.Repositories;
 
-import Application.Entity.Customer;
+import Application.Entity.Product;
 import Application.Entity.Purchase;
 
-
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.persistence.RollbackException;
 import java.util.List;
 
-public class CustomerRepo {
+public class ProductRepo {
     EntityManagerFactory emf;
 
-    public CustomerRepo(EntityManagerFactory emf) {
+    public ProductRepo(EntityManagerFactory emf) {
         this.emf = emf;
     }
 
-    public void saveCustomer(Customer customer) {
+    public void saveProduct(Product product) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(customer);
+        em.persist(product);
         em.getTransaction().commit();
     }
 
-    public void deleteCustomer(long id_customer) {
+    public void deleteProduct(long id_product) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from Customer c where c.id_customer= :id");
-            query.setParameter("id", id_customer);
+            Query query = em.createQuery("delete from Product p where p.id_product= :id");
+            query.setParameter("id", id_product);
             query.executeUpdate();
             em.getTransaction().commit();
             em.close();
@@ -36,13 +38,12 @@ public class CustomerRepo {
         }
     }
 
-    public void deleteCustomer(String name, String surname) {
+    public void deleteProduct(String title) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from Customer c where c.name= :name and c.surname = :surname");
-            query.setParameter("name", name);
-            query.setParameter("name", surname);
+            Query query = em.createQuery("delete from Product p where p.product_title= :title");
+            query.setParameter("title", title);
             query.executeUpdate();
             em.getTransaction().commit();
             em.close();
@@ -52,37 +53,35 @@ public class CustomerRepo {
         }
     }
 
-    public Customer updateCustomer(Customer customer) {
+    public Product updateProduct(Product product) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            customer = em.merge(customer);
+            product = em.merge(product);
             em.getTransaction().commit();
             em.close();
         } catch (RollbackException e) {
             e.printStackTrace();
             em.getTransaction().rollback();
         }
-        return customer;
+        return product;
     }
 
-    public Customer findByIdCustomer(long id_customer) {
+    public Product findByIdProduct(long id_product) {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
-                .setParameter("id", id_customer)
+        return em.createQuery("select p from Product p where p.id_product = :id", Product.class)
+                .setParameter("id", id_product)
                 .getSingleResult();
     }
 
-    public List<Purchase> findPurchases(long id_customer){
+    public List<Purchase> findPurchases(long id_product){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        Customer customer =  em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
-                .setParameter("id", id_customer)
+        Product product =  em.createQuery("select p from Product p where p.id_product = :id", Product.class)
+                .setParameter("id", id_product)
                 .getSingleResult();
-        List<Purchase> purchaseList  = customer.getPurchaseListForCustomer();
+        List<Purchase> purchaseList  = product.getPurchaseListForProduct();
         em.getTransaction().commit();
         return purchaseList;
     }
-
-
 }
