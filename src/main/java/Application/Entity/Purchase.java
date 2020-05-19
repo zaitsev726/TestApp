@@ -3,7 +3,7 @@ package Application.Entity;
 import javax.persistence.*;
 import java.util.Date;
 
-
+@Entity
 public class Purchase {
     @Id
     @GeneratedValue(generator = "purchases_generator", strategy = GenerationType.SEQUENCE)
