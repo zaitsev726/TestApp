@@ -3,6 +3,7 @@ package Application.Repositories;
 import Application.Entity.Customer;
 import Application.Entity.Purchase;
 
+
 import javax.persistence.*;
 import java.util.List;
 
