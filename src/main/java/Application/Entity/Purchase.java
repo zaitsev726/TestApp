@@ -19,6 +19,9 @@ public class Purchase {
     @Column
     private Date purchase_date;
 
+    @Column
+    private int quantity;
+
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
     private Customer customer;
 
@@ -91,6 +94,10 @@ public class Purchase {
         this.purchase_date = purchase_date;
     }
 
+    public int getQuantity() { return quantity; }
+
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
     @Override
     public String toString() {
         return "Purchase{" +
@@ -98,6 +105,7 @@ public class Purchase {
                 ", id_customer=" + id_customer +
                 ", id_product=" + id_product +
                 ", purchase_date=" + purchase_date +
+                ", quantity=" + quantity +
                 '}';
     }
 }

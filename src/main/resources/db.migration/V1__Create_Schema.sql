@@ -42,6 +42,7 @@ CREATE TABLE Purchases
     id_customer integer not null ,
     id_product integer not null ,
     purchases_date date not null ,
+    quantity integer not null ,
     FOREIGN KEY (id_customer) REFERENCES Customers (id_customer) ON DELETE CASCADE ,
     FOREIGN KEY (id_product) REFERENCES  Products (id_product) ON DELETE CASCADE
 );

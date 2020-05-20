@@ -1,9 +1,9 @@
 package Application;
 
+import Application.Controllers.Controller;
+
 public class App {
-    public static void main(String[] args) {
-        //CustomerRepo repo = new CustomerRepo();
-        //System.out.println(repo.findByIdCustomer(1).getPurchaseListForCustomer());
-        System.out.println("1231232131311231323");
+    public static void main(String[] args) throws Exception {
+        Controller controller = new Controller();
     }
 }
