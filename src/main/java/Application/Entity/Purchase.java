@@ -25,11 +25,11 @@ public class Purchase {
     private int quantity;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_customer",updatable = false, nullable = false, insertable = false)
+    @JoinColumn(name = "id_customer", updatable = false, nullable = false, insertable = false)
     private Customer customer;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_product",updatable = false, nullable = false,insertable = false)
+    @JoinColumn(name = "id_product", updatable = false, nullable = false, insertable = false)
     private Product product;
 
     public void setCustomer(Customer customer) {
