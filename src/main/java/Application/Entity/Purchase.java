@@ -4,17 +4,17 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "DBPurchases")
-public class DBPurchases {
+@Table(name = "purchases")
+public class Purchase {
     @Id
     @GeneratedValue(generator = "purchases_generator", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "purchases_generator", sequenceName = "Purchases_generator", allocationSize = 1)
     private int id_purchase;
 
-    @Column(name = "id_product", updatable = false, nullable = false)
+    @Column(name = "id_product")
     private int id_product;
 
-    @Column(name = "id_customer", updatable = false, nullable = false)
+    @Column(name = "id_customer")
     private int id_customer;
 
 
@@ -25,43 +25,45 @@ public class DBPurchases {
     private int quantity;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private DBCustomers DBCustomers;
+    @JoinColumn(name = "id_customer",updatable = false, nullable = false, insertable = false)
+    private Customer customer;
 
     @ManyToOne(optional = false, cascade = CascadeType.ALL)
-    private DBProducts DBProducts;
+    @JoinColumn(name = "id_product",updatable = false, nullable = false,insertable = false)
+    private Product product;
 
-    public void setDBCustomers(DBCustomers DBCustomers) {
-        setCustomer(DBCustomers, true);
+    public void setCustomer(Customer customer) {
+        setCustomer(customer, true);
     }
 
-    void setCustomer(DBCustomers DBCustomers, boolean add) {
-        this.DBCustomers = DBCustomers;
-        if (DBCustomers != null && add){
-            DBCustomers.addPurchase(this, false);
+    void setCustomer(Customer customer, boolean add) {
+        this.customer = customer;
+        if (customer != null && add) {
+            customer.addPurchase(this, false);
         }
     }
 
-    public DBCustomers getDBCustomers() {
-        return DBCustomers;
+    public Customer getCustomers() {
+        return customer;
     }
 
-    public void setDBProducts(DBProducts DBProducts) {
-        setProduct(DBProducts, true);
+    public void setProduct(Product product) {
+        setProduct(product, true);
     }
 
-    void setProduct(DBProducts DBProducts, boolean add) {
-        this.DBProducts = DBProducts;
-        if (DBProducts != null && add){
-            DBProducts.addPurchase(this, false);
+    void setProduct(Product product, boolean add) {
+        this.product = product;
+        if (product != null && add) {
+            product.addPurchase(this, false);
         }
     }
 
-    public DBProducts getDBProducts() {
-        return DBProducts;
+    public Product getProduct() {
+        return product;
     }
 
 
-    public DBPurchases() {
+    public Purchase() {
     }
 
     public int getId_purchase() {
@@ -71,7 +73,7 @@ public class DBPurchases {
     public void setId_purchase(int id_purchase) {
         this.id_purchase = id_purchase;
     }
-/*
+
     public int getId_customer() {
         return id_customer;
     }
@@ -87,7 +89,7 @@ public class DBPurchases {
     public void setId_product(int id_product) {
         this.id_product = id_product;
     }
-*/
+
     public Date getPurchase_date() {
         return purchase_date;
     }
@@ -96,16 +98,20 @@ public class DBPurchases {
         this.purchase_date = purchase_date;
     }
 
-    public int getQuantity() { return quantity; }
+    public int getQuantity() {
+        return quantity;
+    }
 
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 
     @Override
     public String toString() {
         return "Purchase{" +
                 "id_purchase=" + id_purchase +
-             //   ", id_customer=" + id_customer +
-            //    ", id_product=" + id_product +
+                //   ", id_customer=" + id_customer +
+                //    ", id_product=" + id_product +
                 ", purchase_date=" + purchase_date +
                 ", quantity=" + quantity +
                 '}';

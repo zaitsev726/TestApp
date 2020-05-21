@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class DBProducts {
+@Table(name = "products")
+public class Product {
     @Id
     @GeneratedValue(generator = "products_generator", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "products_generator", sequenceName = "Products_generator", allocationSize = 1)
@@ -17,35 +18,35 @@ public class DBProducts {
     @Column
     private float price;
 
-    @OneToMany(mappedBy = "DBProducts", fetch = FetchType.LAZY)
-    private List<DBPurchases> DBPurchasesListForProduct = new ArrayList<>();
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<Purchase> PurchaseListForProduct = new ArrayList<>();
 
-    public void addPurchase(DBPurchases DBPurchases) {
-        addPurchase(DBPurchases, true);
+    public void addPurchase(Purchase purchase) {
+        addPurchase(purchase, true);
     }
 
-    void addPurchase(DBPurchases DBPurchases, boolean set) {
-        if (DBPurchases != null) {
-            if (getDBPurchasesListForProduct().contains(DBPurchases)) {
-                DBPurchasesListForProduct.set(DBPurchasesListForProduct.indexOf(DBPurchases), DBPurchases);
+    void addPurchase(Purchase purchase, boolean set) {
+        if (purchase != null) {
+            if (getPurchaseListForProduct().contains(purchase)) {
+                PurchaseListForProduct.set(PurchaseListForProduct.indexOf(purchase), purchase);
             } else
-                DBPurchasesListForProduct.add(DBPurchases);
+                PurchaseListForProduct.add(purchase);
 
             if (set) {
-                DBPurchases.setProduct(this, false);
+                purchase.setProduct(this, false);
             }
         }
     }
 
-    public List<DBPurchases> getDBPurchasesListForProduct() {
-        return DBPurchasesListForProduct;
+    public List<Purchase> getPurchaseListForProduct() {
+        return PurchaseListForProduct;
     }
 
-    public void setDBPurchasesListForProduct(List<DBPurchases> DBPurchasesListForProduct) {
-        this.DBPurchasesListForProduct = DBPurchasesListForProduct;
+    public void setPurchaseListForProduct(List<Purchase> DBPurchasesListForProduct) {
+        this.PurchaseListForProduct = PurchaseListForProduct;
     }
 
-    public DBProducts() {
+    public Product() {
     }
 
     public int getId_product() {

@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class DBCustomers {
+@Table(name = "customers")
+public class Customer {
     @Id
     @GeneratedValue(generator = "customers_generator", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "customers_generator", sequenceName = "Customers_generator", allocationSize = 1)
@@ -17,35 +18,35 @@ public class DBCustomers {
     @Column
     private String surname;
 
-    @OneToMany(mappedBy = "DBCustomers", fetch = FetchType.LAZY)
-    private List<DBPurchases> DBPurchasesListForCustomer = new ArrayList<>();
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<Purchase> PurchaseListForCustomer = new ArrayList<>();
 
-    public void addPurchase(DBPurchases DBPurchases) {
-        addPurchase(DBPurchases, true);
+    public void addPurchase(Purchase purchase) {
+        addPurchase(purchase, true);
     }
 
-    void addPurchase(DBPurchases DBPurchases, boolean set) {
-        if (DBPurchases != null) {
-            if (getDBPurchasesListForCustomer().contains(DBPurchases)) {
-                DBPurchasesListForCustomer.set(DBPurchasesListForCustomer.indexOf(DBPurchases), DBPurchases);
+    void addPurchase(Purchase purchase, boolean set) {
+        if (purchase != null) {
+            if (PurchaseListForCustomer.contains(purchase)) {
+                PurchaseListForCustomer.set(PurchaseListForCustomer.indexOf(purchase), purchase);
             } else
-                DBPurchasesListForCustomer.add(DBPurchases);
+                PurchaseListForCustomer.add(purchase);
 
             if (set) {
-                DBPurchases.setCustomer(this, false);
+                purchase.setCustomer(this, false);
             }
         }
     }
 
-    public List<DBPurchases> getDBPurchasesListForCustomer() {
-        return DBPurchasesListForCustomer;
+    public List<Purchase> getPurchaseListForCustomer() {
+        return PurchaseListForCustomer;
     }
 
-    public void setDBPurchasesListForCustomer(List<DBPurchases> DBPurchasesListForCustomer) {
-        this.DBPurchasesListForCustomer = DBPurchasesListForCustomer;
+    public void setPurchaseListForCustomer(List<Purchase> PurchaseListForCustomer) {
+        this.PurchaseListForCustomer = PurchaseListForCustomer;
     }
 
-    public DBCustomers() {
+    public Customer() {
     }
 
     public int getId_customer() {

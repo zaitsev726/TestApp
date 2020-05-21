@@ -1,12 +1,10 @@
 package Application.Repositories;
 
-import Application.Entity.DBCustomers;
-import Application.Entity.DBPurchases;
+import Application.Entity.Customer;
+import Application.Entity.Product;
+import Application.Entity.Purchase;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.RollbackException;
+import javax.persistence.*;
 import java.util.List;
 
 public class PurchaseRepo {
@@ -16,39 +14,39 @@ public class PurchaseRepo {
         this.emf = emf;
     }
 
-    public void savePurchase(DBPurchases DBPurchases) {
-      /*  EntityManager em = emf.createEntityManager();
+    public void savePurchase(Purchase purchase) {
+        EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        Customers customers;
-        Products products;
+        Customer customer;
+        Product product;
         try {
-            customers = em.createQuery("select c from Customers c where c.id_customer = :id_customer", Customers.class)
-                    .setParameter("id_customer", purchases.getId_customer())
+            customer = em.createQuery("select c from Customer c where c.id_customer = :id_customer", Customer.class)
+                    .setParameter("id_customer", purchase.getId_customer())
                     .getSingleResult();
-            products = em.createQuery("select p from Products p where p.id_product = :id_product", Products.class)
-                    .setParameter("id_product", purchases.getId_product())
+            product = em.createQuery("select p from Product p where p.id_product = :id_product", Product.class)
+                    .setParameter("id_product", purchase.getId_product())
                     .getSingleResult();
         }catch (NoResultException e){
             return;
         }
 
-        purchases.setCustomers(customers);
-        purchases.setProducts(products);
+        purchase.setCustomer(customer);
+        purchase.setProduct(product);
 
-        customers.addPurchase(purchases);
-        products.addPurchase(purchases);
+        customer.addPurchase(purchase);
+        product.addPurchase(purchase);
 
-        em.persist(products);
-        em.merge(customers);
-        em.merge(products);
-        em.getTransaction().commit();*/
+        em.persist(product);
+        em.merge(customer);
+        em.merge(product);
+        em.getTransaction().commit();
     }
 
     public void deletePurchase(long id_purchase) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from DBPurchases pur where pur.id_purchase = :id");
+            Query query = em.createQuery("delete from Purchase pur where pur.id_purchase = :id");
             query.setParameter("id", id_purchase);
             query.executeUpdate();
             em.getTransaction().commit();
@@ -59,79 +57,74 @@ public class PurchaseRepo {
         }
     }
 
-    public DBPurchases updatePurchase(DBPurchases DBPurchases) {
+    public Purchase updatePurchase(Purchase purchase) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            DBPurchases = em.merge(DBPurchases);
+            purchase = em.merge(purchase);
             em.getTransaction().commit();
             em.close();
         } catch (RollbackException e) {
             e.printStackTrace();
             em.getTransaction().rollback();
         }
-        return DBPurchases;
+        return purchase;
     }
 
-    public DBPurchases findByIdPurchase(long id_purchase) {
+    public Purchase findByIdPurchase(long id_purchase) {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select p from DBPurchases p where p.id_purchase = :id", DBPurchases.class)
+        return em.createQuery("select p from Purchase p where p.id_purchase = :id", Purchase.class)
                 .setParameter("id", id_purchase)
                 .getSingleResult();
     }
 
-    public List<DBPurchases> findByIdCustomer(long id_customer){
+    public List<Purchase> findByIdCustomer(long id_customer){
         EntityManager em = emf.createEntityManager();
-      /*  return em.createQuery("select p from Purchases p where p.id_customer = :id", Purchases.class)
+        return em.createQuery("select p from Purchase p where p.id_customer = :id", Purchase.class)
                 .setParameter("id", id_customer)
-                .getResultList();*/
-      return null;
-    }
-
-    public List<DBPurchases> findByIdProduct(long id_product){
-        EntityManager em = emf.createEntityManager();
-        /*return em.createQuery("select p from Purchases p where p.id_product = :id", Purchases.class)
-                .setParameter("id", id_product)
-                .getResultList();*/
-        return null;
-    }
-
-    public List<DBPurchases> findAll(){
-        EntityManager em = emf.createEntityManager();
-        return em.createQuery("select p from DBPurchases p", DBPurchases.class)
                 .getResultList();
     }
 
-    public List<DBCustomers> findCustomersWithMoreQuantity(int quantity){
-       /* EntityManager em = emf.createEntityManager();
-        return em.createQuery("select distinct c from Customers c join Purchases p on c.id_customer = p.id_customer where  p.quantity >= :quantity", Customers.class)
-                .setParameter("quantity", quantity)
-                .getResultList();*/
-        return null;
+    public List<Purchase> findByIdProduct(long id_product){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select p from Purchase p where p.id_product = :id", Purchase.class)
+                .setParameter("id", id_product)
+                .getResultList();
     }
 
-    public List<DBCustomers> findCustomersWithProductAndMoreQuantity(long id_product, long quantity){
-       /* EntityManager em = emf.createEntityManager();
-        return em.createQuery("select distinct c from Customers c join Purchases p on c.id_customer = p.id_customer where  p.quantity >= :quantity and p.id_product = :id_product", Customers.class)
+    public List<Purchase> findAll(){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select p from Purchase p", Purchase.class)
+                .getResultList();
+    }
+
+    public List<Customer> findCustomerWithMoreQuantity(int quantity){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select distinct c from Customer c join Purchase p on c.id_customer = p.id_customer where  p.quantity >= :quantity", Customer.class)
+                .setParameter("quantity", quantity)
+                .getResultList();
+    }
+
+    public List<Customer> findCustomerWithProductAndMoreQuantity(long id_product, long quantity){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select distinct c from Customer c join Purchase p on c.id_customer = p.id_customer where  p.quantity >= :quantity and p.id_product = :id_product", Customer.class)
                 .setParameter("quantity", quantity)
                 .setParameter("id_product", id_product)
-                .getResultList();*/
-        return null;
+                .getResultList();
     }
 
     public int getAllExpenses(long id_customer) {
-      /*  EntityManager em = emf.createEntityManager();
+        EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        List<Purchases> purchases =  em.createQuery("select distinct p from Purchases p where  p.id_customer = :id_customer", Purchases.class)
+        List<Purchase> purchases =  em.createQuery("select distinct p from Purchase p where  p.id_customer = :id_customer", Purchase.class)
                 .setParameter("id_customer", id_customer)
                 .getResultList();
         int totalSum = 0;
-        for(Purchases purchase : purchases){
-            totalSum += purchase.getQuantity()*purchase.getProducts().getPrice();
+        for(Purchase purchase : purchases){
+            totalSum += purchase.getQuantity()*purchase.getProduct().getPrice();
         }
-        em.getTransaction().commit();*/
+        em.getTransaction().commit();
 
-      //  return totalSum;
-        return 0;
+        return totalSum;
     }
 }

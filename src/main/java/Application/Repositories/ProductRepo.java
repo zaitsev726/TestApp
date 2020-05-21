@@ -1,7 +1,7 @@
 package Application.Repositories;
 
-import Application.Entity.DBProducts;
-import Application.Entity.DBPurchases;
+import Application.Entity.Product;
+import Application.Entity.Purchase;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -16,10 +16,10 @@ public class ProductRepo {
         this.emf = emf;
     }
 
-    public void saveProduct(DBProducts DBProducts) {
+    public void saveProduct(Product DBProduct) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(DBProducts);
+        em.persist(DBProduct);
         em.getTransaction().commit();
     }
 
@@ -27,7 +27,7 @@ public class ProductRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from DBProducts p where p.id_product= :id");
+            Query query = em.createQuery("delete from Product p where p.id_product= :id");
             query.setParameter("id", id_product);
             query.executeUpdate();
             em.getTransaction().commit();
@@ -42,7 +42,7 @@ public class ProductRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from DBProducts p where p.product_title= :title");
+            Query query = em.createQuery("delete from Product p where p.product_title= :title");
             query.setParameter("title", title);
             query.executeUpdate();
             em.getTransaction().commit();
@@ -53,41 +53,41 @@ public class ProductRepo {
         }
     }
 
-    public DBProducts updateProduct(DBProducts DBProducts) {
+    public Product updateProduct(Product DBProduct) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            DBProducts = em.merge(DBProducts);
+            DBProduct = em.merge(DBProduct);
             em.getTransaction().commit();
             em.close();
         } catch (RollbackException e) {
             e.printStackTrace();
             em.getTransaction().rollback();
         }
-        return DBProducts;
+        return DBProduct;
     }
 
-    public DBProducts findByIdProduct(long id_product) {
+    public Product findByIdProduct(long id_product) {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select p from DBProducts p where p.id_product = :id", DBProducts.class)
+        return em.createQuery("select p from Product p where p.id_product = :id", Product.class)
                 .setParameter("id", id_product)
                 .getSingleResult();
     }
 
-    public List<DBPurchases> findPurchases(long id_product){
+    public List<Purchase> findPurchase(long id_product){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        DBProducts DBProducts =  em.createQuery("select p from DBProducts p where p.id_product = :id", DBProducts.class)
+        Product DBProduct =  em.createQuery("select p from Product p where p.id_product = :id", Product.class)
                 .setParameter("id", id_product)
                 .getSingleResult();
-        List<DBPurchases> DBPurchasesList = DBProducts.getDBPurchasesListForProduct();
+        List<Purchase> DBPurchaseList = DBProduct.getPurchaseListForProduct();
         em.getTransaction().commit();
-        return DBPurchasesList;
+        return DBPurchaseList;
     }
 
-    public DBProducts findByTitle(String title){
+    public Product findByTitle(String title){
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select p from DBProducts p where p.product_title = :title", DBProducts.class)
+        return em.createQuery("select p from Product p where p.product_title = :title", Product.class)
                 .setParameter("title", title)
                 .getSingleResult();
     }

@@ -1,10 +1,12 @@
 package Application.Repositories;
 
-import Application.Entity.DBCustomers;
-import Application.Entity.DBPurchases;
+import Application.Entity.Customer;
+import Application.Entity.Purchase;
 
-
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.persistence.RollbackException;
 import java.util.List;
 
 public class CustomerRepo {
@@ -14,10 +16,10 @@ public class CustomerRepo {
         this.emf = emf;
     }
 
-    public void saveCustomer(DBCustomers DBCustomers) {
+    public void saveCustomer(Customer DBCustomer) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(DBCustomers);
+        em.persist(DBCustomer);
         em.getTransaction().commit();
     }
 
@@ -25,7 +27,7 @@ public class CustomerRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from DBCustomers c where c.id_customer= :id");
+            Query query = em.createQuery("delete from Customer c where c.id_customer= :id");
             query.setParameter("id", id_customer);
             query.executeUpdate();
             em.getTransaction().commit();
@@ -40,7 +42,7 @@ public class CustomerRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from DBCustomers c where c.name= :name and c.surname = :surname");
+            Query query = em.createQuery("delete from Customer c where c.name= :name and c.surname = :surname");
             query.setParameter("name", name);
             query.setParameter("name", surname);
             query.executeUpdate();
@@ -52,48 +54,48 @@ public class CustomerRepo {
         }
     }
 
-    public DBCustomers updateCustomer(DBCustomers DBCustomers) {
+    public Customer updateCustomer(Customer DBCustomer) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            DBCustomers = em.merge(DBCustomers);
+            DBCustomer = em.merge(DBCustomer);
             em.getTransaction().commit();
             em.close();
         } catch (RollbackException e) {
             e.printStackTrace();
             em.getTransaction().rollback();
         }
-        return DBCustomers;
+        return DBCustomer;
     }
 
-    public DBCustomers findByIdCustomer(long id_customer) {
+    public Customer findByIdCustomer(long id_customer) {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select c from DBCustomers c where c.id_customer = :id", DBCustomers.class)
+        return em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
                 .setParameter("id", id_customer)
                 .getSingleResult();
     }
 
-    public List<DBPurchases> findPurchases(long id_customer){
+    public List<Purchase> findPurchase(long id_customer){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        DBCustomers DBCustomers =  em.createQuery("select c from DBCustomers c where c.id_customer = :id", DBCustomers.class)
+        Customer DBCustomer =  em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
                 .setParameter("id", id_customer)
                 .getSingleResult();
-        List<DBPurchases> DBPurchasesList = DBCustomers.getDBPurchasesListForCustomer();
+        List<Purchase> DBPurchaseList = DBCustomer.getPurchaseListForCustomer();
         em.getTransaction().commit();
-        return DBPurchasesList;
+        return DBPurchaseList;
     }
 
-    public List<DBCustomers> findBySurname(String surname){
+    public List<Customer> findBySurname(String surname){
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select c from DBCustomers c where c.surname = :surname", DBCustomers.class)
+        return em.createQuery("select c from Customer c where c.surname = :surname", Customer.class)
                 .setParameter("surname", surname)
                 .getResultList();
     }
 
-    public List<DBCustomers> findAll(){
+    public List<Customer> findAll(){
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select c from DBCustomers c", DBCustomers.class)
+        return em.createQuery("select c from Customer c", Customer.class)
                 .getResultList();
     }
 
