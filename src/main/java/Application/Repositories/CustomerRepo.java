@@ -1,7 +1,7 @@
 package Application.Repositories;
 
-import Application.Entity.Customer;
-import Application.Entity.Purchase;
+import Application.Entity.DBCustomers;
+import Application.Entity.DBPurchases;
 
 
 import javax.persistence.*;
@@ -14,10 +14,10 @@ public class CustomerRepo {
         this.emf = emf;
     }
 
-    public void saveCustomer(Customer customer) {
+    public void saveCustomer(DBCustomers DBCustomers) {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        em.persist(customer);
+        em.persist(DBCustomers);
         em.getTransaction().commit();
     }
 
@@ -25,7 +25,7 @@ public class CustomerRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from Customer c where c.id_customer= :id");
+            Query query = em.createQuery("delete from DBCustomers c where c.id_customer= :id");
             query.setParameter("id", id_customer);
             query.executeUpdate();
             em.getTransaction().commit();
@@ -40,7 +40,7 @@ public class CustomerRepo {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            Query query = em.createQuery("delete from Customer c where c.name= :name and c.surname = :surname");
+            Query query = em.createQuery("delete from DBCustomers c where c.name= :name and c.surname = :surname");
             query.setParameter("name", name);
             query.setParameter("name", surname);
             query.executeUpdate();
@@ -52,37 +52,49 @@ public class CustomerRepo {
         }
     }
 
-    public Customer updateCustomer(Customer customer) {
+    public DBCustomers updateCustomer(DBCustomers DBCustomers) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            customer = em.merge(customer);
+            DBCustomers = em.merge(DBCustomers);
             em.getTransaction().commit();
             em.close();
         } catch (RollbackException e) {
             e.printStackTrace();
             em.getTransaction().rollback();
         }
-        return customer;
+        return DBCustomers;
     }
 
-    public Customer findByIdCustomer(long id_customer) {
+    public DBCustomers findByIdCustomer(long id_customer) {
         EntityManager em = emf.createEntityManager();
-        return em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
+        return em.createQuery("select c from DBCustomers c where c.id_customer = :id", DBCustomers.class)
                 .setParameter("id", id_customer)
                 .getSingleResult();
     }
 
-    public List<Purchase> findPurchases(long id_customer){
+    public List<DBPurchases> findPurchases(long id_customer){
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
-        Customer customer =  em.createQuery("select c from Customer c where c.id_customer = :id", Customer.class)
+        DBCustomers DBCustomers =  em.createQuery("select c from DBCustomers c where c.id_customer = :id", DBCustomers.class)
                 .setParameter("id", id_customer)
                 .getSingleResult();
-        List<Purchase> purchaseList  = customer.getPurchaseListForCustomer();
+        List<DBPurchases> DBPurchasesList = DBCustomers.getDBPurchasesListForCustomer();
         em.getTransaction().commit();
-        return purchaseList;
+        return DBPurchasesList;
     }
 
+    public List<DBCustomers> findBySurname(String surname){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select c from DBCustomers c where c.surname = :surname", DBCustomers.class)
+                .setParameter("surname", surname)
+                .getResultList();
+    }
+
+    public List<DBCustomers> findAll(){
+        EntityManager em = emf.createEntityManager();
+        return em.createQuery("select c from DBCustomers c", DBCustomers.class)
+                .getResultList();
+    }
 
 }
