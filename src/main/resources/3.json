@@ -1,0 +1,22 @@
+{
+  "criterias": [
+    {
+      "lastName": "Cидоров"
+    },
+    {
+      "productName": "Минеральная вода",
+      "minTimes": 3
+    },
+    {
+      "minExpenses": 112,
+      "maxExpenses": 4000
+    },
+    {
+      "badCustomers": 3
+    },
+    {
+      "badCustomers": 4
+    }
+
+  ]
+}

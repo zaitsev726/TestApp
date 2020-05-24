@@ -1,0 +1,8 @@
+{
+  "criterias": [
+    {
+      "minExpenses": 1000,
+      "maxExpenses": "4000d"
+    }
+  ]
+}

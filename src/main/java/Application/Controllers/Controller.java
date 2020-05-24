@@ -42,7 +42,7 @@ public class Controller {
     public Controller() throws IOException {
         currentParameters = new LinkedHashMap<>();
 
-        File f = new File(getClass().getClassLoader().getResource("1.json").getFile());
+        File f = new File(getClass().getClassLoader().getResource("10.json").getFile());
 
         File file = new File("outFile\\out.json");
         JsonReader reader = new JsonReader(new FileReader(f));
@@ -167,7 +167,7 @@ public class Controller {
                                 try {
                                     int minTimes = Integer.parseInt(entry.getValue());
                                     Product product = null;
-                                    if (minTimes >= 0) {
+                                    if (minTimes > 0) {
                                         try {
                                             product = productRepo.findByTitle(title);
                                         } catch (NoResultException e) {
@@ -311,23 +311,28 @@ public class Controller {
                             if (iterator.hasNext()) {
                                 entry = iterator.next();
                                 Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
-                                for (Customer customer : customerRepo.findAll()) {
+                                if(start.getTime() < end.getTime()) {
+                                    for (Customer customer : customerRepo.findAll()) {
 
-                                    parameters.put("name", customer.getName());
+                                        parameters.put("name", customer.getName());
 
-                                    printBeginCriteria(writer, parameters);
-                                    System.out.println("start");
-                                    List<Purchase> purchaseList = new ArrayList<>();
-                                    purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
-                                    System.out.println(purchaseList);
-                                    printPurchasesList(writer, purchaseList);
-                                    printEndCriteria(writer);
+                                        printBeginCriteria(writer, parameters);
+                                        System.out.println("start");
+                                        List<Purchase> purchaseList = new ArrayList<>();
+                                        purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
+                                        System.out.println(purchaseList);
+                                        printPurchasesList(writer, purchaseList);
+                                        printEndCriteria(writer);
+                                    }
+                                }else {
+                                    writer.nullValue();
+                                    printError("Wrong start Date. Expected startDate earlier endDate.");
                                 }
 
                             }
                         } catch (ParseException parseException) {
                             writer.nullValue();
-                            printError("Wrong value for " + entry.getKey() + ". Expected: Date with format \"yyyy-MM-dd\", Received: " + entry.getValue());
+                            printError("Wrong value for " + entry.getKey() + ". Expected: Date with format yyyy-MM-dd, Received: " + entry.getValue());
                         }
                         break;
                     default:
