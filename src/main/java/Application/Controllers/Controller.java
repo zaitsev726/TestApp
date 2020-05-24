@@ -27,7 +27,7 @@ import static java.lang.System.exit;
 
 public class Controller {
     private EntityManagerFactory emf = Persistence.createEntityManagerFactory("model");
-    private Map<String, String> currentParameters = null;
+    private Map<String, String> currentParameters;
 
     private String currentKey = "";
     private String currentValue = "";
@@ -49,16 +49,16 @@ public class Controller {
             e.printStackTrace();
             System.out.println("Something wrong with input file.");
             exit(0);
-        } catch (NullPointerException n){
+        } catch (NullPointerException n) {
             n.printStackTrace();
             System.out.println("No such file.");
         }
 
-        if (!outputFile.equals("") && !outputFile.equals(inputFile))
+        if (!outputFile.equals(""))
             fileName = outputFile;
 
         File out = new File(homeDirectory + fileName);
-        search(type, out);
+        searchCustomers(type, out);
         System.out.println("Done");
     }
 
@@ -99,11 +99,6 @@ public class Controller {
             } else if (token.equals(JsonToken.BEGIN_OBJECT)) {
                 handleObject(reader);
             } else if (token.equals(JsonToken.END_OBJECT)) {
-                /*if(!currentValue.equals("") && !currentKey.equals("")){
-                    //   System.out.println("Current :" + currentKey + " " + currentValue);
-                    currentKey = "";
-                    currentValue = "";
-                }*/
                 reader.endObject();
             } else
                 handleNonArrayToken(reader, token);
@@ -138,7 +133,7 @@ public class Controller {
         }
     }
 
-    public void search(String type, File file) {
+    public void searchCustomers(String type, File file) {
         try (JsonWriter writer = new JsonWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.beginObject();
             writer.name("type");
@@ -160,11 +155,9 @@ public class Controller {
                         System.out.println(customersList);
 
                         parameters.put("lastName", entry.getValue());
-
                         printBeginCriteria(writer, parameters);
                         printCustomersList(writer, customersList);
                         printEndCriteria(writer);
-
                         break;
                     case ("productName"):
                         String title = entry.getValue();
@@ -173,7 +166,7 @@ public class Controller {
                             if (entry.getKey().equals("minTimes")) {
                                 try {
                                     int minTimes = Integer.parseInt(entry.getValue());
-                                    Product product = null;
+                                    Product product;
                                     if (minTimes > 0) {
                                         try {
                                             product = productRepo.findByTitle(title);
@@ -257,7 +250,6 @@ public class Controller {
                             int quantity = Integer.parseInt(entry.getValue());
                             if (quantity > 0) {
                                 HashMap<Customer, Integer> customerQuantity = new HashMap<>();
-                                LinkedList<Customer> linkedList = new LinkedList<>();
                                 for (Customer customer : customerRepo.findAll()) {
                                     int cur = 0;
                                     for (Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())) {
@@ -265,10 +257,7 @@ public class Controller {
                                     }
                                     customerQuantity.put(customer, cur);
                                 }
-                           /* customerQuantity = customerQuantity.entrySet()
-                                    .stream()
-                                    .sorted(Map.Entry.comparingByValue())
-                                    .forEach(System.out::println);*/
+
                                 customerQuantity = customerQuantity.entrySet()
                                         .stream()
                                         .sorted(Map.Entry.comparingByValue())
@@ -284,7 +273,7 @@ public class Controller {
                                 }
                                 iter = customerQuantity.entrySet().iterator();
                                 for (int i = 0; i < quantity; i++) {
-                                    Map.Entry<Customer, Integer> e = null;
+                                    Map.Entry<Customer, Integer> e;
                                     if (iter.hasNext())
                                         e = iter.next();
                                     else {
@@ -325,8 +314,7 @@ public class Controller {
 
                                         printBeginCriteria(writer, parameters);
                                         System.out.println("start");
-                                        List<Purchase> purchaseList = new ArrayList<>();
-                                        purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
+                                        List<Purchase> purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
                                         System.out.println(purchaseList);
                                         printPurchasesList(writer, purchaseList);
                                         printEndCriteria(writer);
