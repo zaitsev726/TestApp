@@ -8,12 +8,14 @@ import Application.Repositories.ProductRepo;
 import Application.Repositories.PurchaseRepo;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,16 +32,25 @@ public class Controller {
     private PurchaseRepo purchaseRepo = new PurchaseRepo(emf);
     private ProductRepo productRepo = new ProductRepo(emf);
 
+    private String homeDirectory = "outFile\\";
+
+    JsonWriter writer;
     public Controller() throws IOException {
         currentParameters = new LinkedHashMap<>();
 
-        // ClassLoader classLoader = App.class.getClassLoader();
         File f = new File(getClass().getClassLoader().getResource("1.json").getFile());
 
+        File file = new File("outFile\\out.json");
         JsonReader reader = new JsonReader(new FileReader(f));
-        handleObject(reader);
 
+        writer = new JsonWriter(new FileWriter(file));
+
+        handleObject(reader);
         search();
+
+        writer.close();
+        System.out.println("Done");
+
     }
 
     private void handleObject(JsonReader reader) throws IOException {
@@ -118,8 +129,16 @@ public class Controller {
         }
     }
 
-    public void search(){
+    public void search() throws IOException {
         Iterator<Map.Entry<String, String>> iterator = currentParameters.entrySet().iterator();
+        writer.beginObject();
+
+        writer.name("type");
+        writer.value("HZ");
+        writer.name("results");
+
+        writer.beginArray();
+        LinkedHashMap<String, String> parameters = null;
         while (iterator.hasNext()){
             List<Customer> customersList = new ArrayList<>();
             Map.Entry<String,String> entry = iterator.next();
@@ -128,6 +147,15 @@ public class Controller {
                     case ("lastName"):
                         customersList = customerRepo.findBySurname(entry.getValue());
                         System.out.println(customersList);
+                        parameters = new LinkedHashMap<>();
+                        parameters.put("lastName", entry.getValue());
+                        printBeginCriteria(writer, parameters);
+                        for(Customer customer : customersList) {
+                            writer.beginObject();
+                            writer.name("last").value(customer.getName());
+                            writer.endObject();
+                        }
+                        printEndCritetia(writer);
                         break;
                     case ("productName"):
                         String title = entry.getValue();
@@ -137,6 +165,17 @@ public class Controller {
                                 int minTimes = Integer.parseInt(entry.getValue());
                                 Product product = productRepo.findByTitle(title);
                                 customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
+
+                                parameters = new LinkedHashMap<>();
+                                parameters.put("productName", title);
+                                parameters.put("minTimes", String.valueOf(minTimes));
+                                printBeginCriteria(writer,parameters);
+                                for(Customer customer : customersList) {
+                                    writer.beginObject();
+                                    writer.name("last").value(customer.getName());
+                                    writer.endObject();
+                                }
+                                printEndCritetia(writer);
                             }
                         }
                         System.out.println(customersList);
@@ -152,23 +191,60 @@ public class Controller {
                                     if(expenses > min && expenses < max)
                                         customersList.add(DBCustomers);
                                 }
+                                parameters = new LinkedHashMap<>();
+                                parameters.put("minExpenses", String.valueOf(min));
+                                parameters.put("maxExpenses", String.valueOf(max));
+                                printBeginCriteria(writer, parameters);
+                                for(Customer customer : customersList) {
+                                    writer.beginObject();
+                                    writer.name("last").value(customer.getName());
+                                    writer.endObject();
+                                }
+                                printEndCritetia(writer);
                             }
                         }
                         System.out.println(customersList);
                         break;
                     case ("badCustomers"):
-                        HashMap<Customer,Integer> customerQuantity = new HashMap<>();
-                        for(Customer customer : customerRepo.findAll()){
-                            int quantity = 0;
-                            for(Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())){
-                                quantity += purchase.getQuantity();
+                        try {
+                            int quantity = Integer.parseInt(entry.getValue());
+                            HashMap<Customer, Integer> customerQuantity = new HashMap<>();
+                            for (Customer customer : customerRepo.findAll()) {
+                                int cur = 0;
+                                for (Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())) {
+                                    cur += purchase.getQuantity();
+                                }
+                                customerQuantity.put(customer, cur);
                             }
-                            customerQuantity.put(customer, quantity);
+                            customerQuantity.entrySet()
+                                    .stream()
+                                    .sorted(Map.Entry.comparingByValue())
+                                    .forEach(System.out::println);
+                            Iterator<Map.Entry<Customer,Integer>> iter = customerQuantity.entrySet().iterator();
+
+                            for(int i = 0; i < quantity; i++){
+                                Map.Entry<Customer,Integer> e = iter.next();
+                                if(!customersList.contains(e.getKey())){
+                                    customersList.add(e.getKey());
+                                }else{
+                                    System.out.println("BAD QUANTITY VALUE");
+                                }
+                            }
+
+                            parameters = new LinkedHashMap<>();
+                            parameters.put("badCustomers", String.valueOf(quantity));
+                            printBeginCriteria(writer, parameters);
+                            for(Customer customer : customersList) {
+                                writer.beginObject();
+                                writer.name("last").value(customer.getName());
+                                writer.endObject();
+                            }
+                            printEndCritetia(writer);
+
+
+                        }catch (NumberFormatException e){
+
                         }
-                        customerQuantity.entrySet()
-                                .stream()
-                                .sorted(Map.Entry.comparingByValue())
-                                .forEach(System.out::println);
 
                         break;
                     case ("startDate"):
@@ -176,11 +252,24 @@ public class Controller {
                             Date start = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
                             if(iterator.hasNext()){
                                 entry = iterator.next();
-                                Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
+                                Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue  ());
                                 for(Customer customer : customerRepo.findAll()){
+                                    parameters = new LinkedHashMap<>();
+                                    parameters.put("name", customer.getName());
+
+                                    printBeginCriteria(writer,parameters);
                                     System.out.println("start");
-                                    System.out.println(purchaseRepo.findPurchasesBetweenDates(start,end));
+                                    List<Purchase> purchaseList = new ArrayList<>();
+                                    purchaseList= purchaseRepo.findPurchasesBetweenDates(start,end);
+                                    System.out.println(purchaseList);
+                                    for(Purchase purchase: purchaseList){
+                                        writer.beginObject();
+                                        writer.name(purchase.getProduct().getProduct_title()).value(Math.round(purchase.getProduct().getPrice() * 100.0)/100.0);
+                                        writer.endObject();
+                                    }
+                                    printEndCritetia(writer);
                                 }
+
                             }
                         } catch (ParseException parseException){
                                 parseException.printStackTrace();
@@ -192,6 +281,45 @@ public class Controller {
             }catch (NoResultException e){
                 System.out.println("NoResult");
             }
+        }
+
+        writer.endArray();
+        writer.endObject();
+    }
+
+
+    private void printBeginCriteria(JsonWriter writer, LinkedHashMap<String, String> criteria) throws IOException {
+        writer.beginObject();
+        writer.name("criteria");
+        writer.beginObject();
+        for(Map.Entry<String,String> entry : criteria.entrySet()){
+            writer.name(entry.getKey());
+            writer.value(entry.getValue());
+        }
+        writer.endObject();
+        writer.name("results:");
+        writer.beginArray();
+    }
+
+    private void printEndCritetia(JsonWriter writer) throws IOException {
+        writer.endArray();
+        writer.endObject();
+    }
+
+    private void printError(JsonWriter writer, String message){
+        try {
+            writer.nullValue();
+            File out = new File("outFile\\out.json");
+            writer = new JsonWriter(new FileWriter(out));
+            writer.beginObject();
+            writer.name("type");
+            writer.value("error");
+            writer.name("message");
+            writer.value(message);
+            writer.endObject();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Every thing is bad");
         }
     }
 }

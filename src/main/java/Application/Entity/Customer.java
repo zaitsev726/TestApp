@@ -3,6 +3,7 @@ package Application.Entity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "customers")
@@ -81,4 +82,16 @@ public class Customer {
                 ", surname='" + surname + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return id_customer == customer.id_customer &&
+                Objects.equals(name, customer.name) &&
+                Objects.equals(surname, customer.surname) &&
+                Objects.equals(PurchaseListForCustomer, customer.PurchaseListForCustomer);
+    }
+
 }
