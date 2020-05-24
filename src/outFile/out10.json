@@ -1,0 +1,4 @@
+{
+  "type": "error",
+  "message": "Wrong value for startDate. Expected: Date with format yyyy-MM-dd, Received: 2020.01.14"
+}

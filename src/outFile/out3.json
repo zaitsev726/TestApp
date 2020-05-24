@@ -1,0 +1,98 @@
+{
+  "type": "search",
+  "results": [
+    {
+      "criteria": {
+        "lastName": "Cидоров"
+      },
+      "results:": []
+    },
+    {
+      "criteria": {
+        "productName": "Минеральная вода",
+        "minTimes": "3"
+      },
+      "results:": [
+        {
+          "lastName": "Иванов",
+          "firstName": "Владимир"
+        },
+        {
+          "lastName": "Блинов",
+          "firstName": "Александр"
+        }
+      ]
+    },
+    {
+      "criteria": {
+        "minExpenses": "112",
+        "maxExpenses": "4000"
+      },
+      "results:": [
+        {
+          "lastName": "Белоусова",
+          "firstName": "Виктория"
+        },
+        {
+          "lastName": "Кудряшов",
+          "firstName": "Роберт"
+        },
+        {
+          "lastName": "Королёв",
+          "firstName": "Дональд"
+        },
+        {
+          "lastName": "Блинов",
+          "firstName": "Роман"
+        },
+        {
+          "lastName": "Логинова",
+          "firstName": "Амира"
+        },
+        {
+          "lastName": "Лобанова",
+          "firstName": "Эжени"
+        },
+        {
+          "lastName": "Шашкова",
+          "firstName": "Триана"
+        },
+        {
+          "lastName": "Ковалёв",
+          "firstName": "Архип"
+        },
+        {
+          "lastName": "Иванов",
+          "firstName": "Иван"
+        },
+        {
+          "lastName": "Клолёва",
+          "firstName": "Анастасия"
+        }
+      ]
+    },
+    {
+      "criteria": {
+        "badCustomers": "4"
+      },
+      "results:": [
+        {
+          "lastName": "Клолёва",
+          "firstName": "Анастасия"
+        },
+        {
+          "lastName": "Белоусова",
+          "firstName": "Виктория"
+        },
+        {
+          "lastName": "Логинова",
+          "firstName": "Амира"
+        },
+        {
+          "lastName": "Агафонов",
+          "firstName": "Константин"
+        }
+      ]
+    }
+  ]
+}

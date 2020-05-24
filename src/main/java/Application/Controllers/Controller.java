@@ -171,9 +171,8 @@ public class Controller {
                                         try {
                                             product = productRepo.findByTitle(title);
                                         } catch (NoResultException e) {
-                                            parameters.put("productName", title);
-                                            printBeginCriteria(writer, parameters);
-                                            printEndCriteria(writer);
+                                            writer.nullValue();
+                                            printError("No such product.");
                                             break;
                                         }
                                         customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
@@ -310,7 +309,7 @@ public class Controller {
                                 if (start.getTime() < end.getTime()) {
                                     for (Customer customer : customerRepo.findAll()) {
 
-                                        parameters.put("name", customer.getName());
+                                        parameters.put("name", customer.getName() + " " + customer.getSurname());
 
                                         printBeginCriteria(writer, parameters);
                                         System.out.println("start");
@@ -362,7 +361,8 @@ public class Controller {
     private void printCustomersList(JsonWriter writer, List<Customer> customersList) throws IOException {
         for (Customer customer : customersList) {
             writer.beginObject();
-            writer.name("last").value(customer.getName());
+            writer.name("lastName").value(customer.getSurname());
+            writer.name("firstName").value(customer.getName());
             writer.endObject();
         }
     }

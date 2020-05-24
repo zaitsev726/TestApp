@@ -1,0 +1,68 @@
+{
+  "type": "search",
+  "results": [
+    {
+      "criteria": {
+        "lastName": "�?ванов"
+      },
+      "results:": []
+    },
+    {
+      "criteria": {
+        "productName": "Минеральная вода"
+      },
+      "results:": []
+    },
+    {
+      "criteria": {
+        "minExpenses": "112",
+        "maxExpenses": "4000"
+      },
+      "results:": [
+        {
+          "last": "���������"
+        },
+        {
+          "last": "��������"
+        },
+        {
+          "last": "������"
+        },
+        {
+          "last": "������"
+        },
+        {
+          "last": "��������"
+        },
+        {
+          "last": "��������"
+        },
+        {
+          "last": "�������"
+        },
+        {
+          "last": "������"
+        },
+        {
+          "last": "������"
+        }
+      ]
+    },
+    {
+      "criteria": {
+        "badCustomers": "3"
+      },
+      "results:": [
+        {
+          "last": "���������"
+        },
+        {
+          "last": "��������"
+        },
+        {
+          "last": "������"
+        }
+      ]
+    }
+  ]
+}

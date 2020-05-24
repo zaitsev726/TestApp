@@ -1,0 +1,4 @@
+{
+  "type": "error",
+  "message": "Wrong value for maxExpenses. Expected: Number, Received: 4000d"
+}

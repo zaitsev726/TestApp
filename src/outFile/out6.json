@@ -1,0 +1,4 @@
+{
+  "type": "error",
+  "message": "Wrong argument for minTimes. Expected value greater than 0."
+}

@@ -1,0 +1,4 @@
+{
+  "type": "error",
+  "message": "Wrong start Date. Expected startDate earlier endDate."
+}

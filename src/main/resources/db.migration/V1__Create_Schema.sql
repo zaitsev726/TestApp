@@ -56,11 +56,11 @@ insert into customers(name, surname) values ('Амира','Логинова');
 insert into customers(name, surname) values ('Эжени','Лобанова');
 insert into customers(name, surname) values ('Триана','Шашкова');
 insert into customers(name, surname) values ('Архип','Ковалёв');
-
 insert into customers(name, surname) values ('Иван','Иванов');
 insert into customers(name, surname) values ('Владимир','Иванов');
 insert into customers(name, surname) values ('Александр','Блинов');
 insert into customers(name, surname) values ('Анастасия','Клолёва');
+insert into customers(name, surname) values ('Любовь','Кудряшова');
 
 insert into products(product_title, price) values ('Манго',64.90);
 insert into products(product_title, price) values ('Голубика',119.00);
@@ -121,23 +121,23 @@ insert into purchases(id_customer, id_product, purchase_date,quantity) values (1
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,2,date '2020-03-03',6);
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
 
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (11,22,date '2019-07-23',4);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (11,8,date '2019-07-23',7);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (11,8,date '2019-07-23',2);
 
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,3,date '2020-05-17',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,8,date '2020-03-17',3);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,25,date '2020-03-17',6);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,22,date '2020-03-17',4);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,16,date '2020-03-17',2);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,21,date '2020-03-17',5);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (12,1,date '2020-03-17',3);
 
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (13,2,date '2019-09-09',3);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (13,7,date '2019-09-09',2);
 
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
-insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (14,10,date '2020-01-12',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (14,18,date '2020-01-12',6);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (14,19,date '2020-01-12',8);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (14,9,date '2020-01-12',4);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (14,6,date '2020-01-12',5);

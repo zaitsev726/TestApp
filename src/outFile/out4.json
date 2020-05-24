@@ -1,0 +1,4 @@
+{
+  "type": "error",
+  "message": "Bad argument for minExpenses. Expected value greater than 0."
+}
