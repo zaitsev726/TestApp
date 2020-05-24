@@ -21,6 +21,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static java.lang.System.exit;
+
 public class Controller {
     private EntityManagerFactory emf = Persistence.createEntityManagerFactory("model");
     private Map<String, String> currentParameters = null;
@@ -33,8 +35,9 @@ public class Controller {
     private ProductRepo productRepo = new ProductRepo(emf);
 
     private String homeDirectory = "outFile\\";
+    private String fileName = "out.json";
 
-    JsonWriter writer;
+
     public Controller() throws IOException {
         currentParameters = new LinkedHashMap<>();
 
@@ -43,12 +46,10 @@ public class Controller {
         File file = new File("outFile\\out.json");
         JsonReader reader = new JsonReader(new FileReader(f));
 
-        writer = new JsonWriter(new FileWriter(file));
 
         handleObject(reader);
-        search();
+        search(file);
 
-        writer.close();
         System.out.println("Done");
 
     }
@@ -65,9 +66,9 @@ public class Controller {
             } else
                 handleNonArrayToken(reader, token);
         }
-        if(!currentValue.equals("") && !currentKey.equals("")){
+        if (!currentValue.equals("") && !currentKey.equals("")) {
             System.out.println("Current :" + currentKey + " " + currentValue);
-            currentParameters.put(currentKey,currentValue);
+            currentParameters.put(currentKey, currentValue);
             currentKey = "";
             currentValue = "";
         }
@@ -112,7 +113,7 @@ public class Controller {
         if (token.equals(JsonToken.NAME)) {
             if (!currentKey.equals("") && !currentValue.equals("")) {
                 System.out.println("Current :" + currentKey + " " + currentValue);
-                currentParameters.put(currentKey,currentValue);
+                currentParameters.put(currentKey, currentValue);
                 currentKey = "";
                 currentValue = "";
             }
@@ -129,162 +130,168 @@ public class Controller {
         }
     }
 
-    public void search() throws IOException {
-        Iterator<Map.Entry<String, String>> iterator = currentParameters.entrySet().iterator();
-        writer.beginObject();
+    public void search(File file) throws IOException {
+        try (JsonWriter writer = new JsonWriter(new FileWriter(file))) {
+            writer.beginObject();
+            writer.name("type");
+            writer.value("type_search_date");
 
-        writer.name("type");
-        writer.value("HZ");
-        writer.name("results");
+            writer.name("results");
+            writer.beginArray();
 
-        writer.beginArray();
-        LinkedHashMap<String, String> parameters = null;
-        while (iterator.hasNext()){
-            List<Customer> customersList = new ArrayList<>();
-            Map.Entry<String,String> entry = iterator.next();
-            try {
-                switch (entry.getKey()) {
-                    case ("lastName"):
-                        customersList = customerRepo.findBySurname(entry.getValue());
-                        System.out.println(customersList);
-                        parameters = new LinkedHashMap<>();
-                        parameters.put("lastName", entry.getValue());
-                        printBeginCriteria(writer, parameters);
-                        for(Customer customer : customersList) {
-                            writer.beginObject();
-                            writer.name("last").value(customer.getName());
-                            writer.endObject();
-                        }
-                        printEndCritetia(writer);
-                        break;
-                    case ("productName"):
-                        String title = entry.getValue();
-                        if(iterator.hasNext()){
-                            entry = iterator.next();
-                            if(entry.getKey().equals("minTimes")){
-                                int minTimes = Integer.parseInt(entry.getValue());
-                                Product product = productRepo.findByTitle(title);
-                                customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
+            Iterator<Map.Entry<String, String>> iterator = currentParameters.entrySet().iterator();
+            while (iterator.hasNext()) {
+                List<Customer> customersList = new ArrayList<>();
+                LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
 
-                                parameters = new LinkedHashMap<>();
-                                parameters.put("productName", title);
-                                parameters.put("minTimes", String.valueOf(minTimes));
-                                printBeginCriteria(writer,parameters);
-                                for(Customer customer : customersList) {
-                                    writer.beginObject();
-                                    writer.name("last").value(customer.getName());
-                                    writer.endObject();
-                                }
-                                printEndCritetia(writer);
-                            }
-                        }
-                        System.out.println(customersList);
-                        break;
-                    case ("minExpenses"):
-                        int min = Integer.parseInt(entry.getValue());
-                        if(iterator.hasNext()){
-                            entry = iterator.next();
-                            if(entry.getKey().equals("maxExpenses")){
-                                int max = Integer.parseInt(entry.getValue());
-                                for(Customer DBCustomers : customerRepo.findAll()){
-                                    int expenses = purchaseRepo.getAllExpenses(DBCustomers.getId_customer());
-                                    if(expenses > min && expenses < max)
-                                        customersList.add(DBCustomers);
-                                }
-                                parameters = new LinkedHashMap<>();
-                                parameters.put("minExpenses", String.valueOf(min));
-                                parameters.put("maxExpenses", String.valueOf(max));
-                                printBeginCriteria(writer, parameters);
-                                for(Customer customer : customersList) {
-                                    writer.beginObject();
-                                    writer.name("last").value(customer.getName());
-                                    writer.endObject();
-                                }
-                                printEndCritetia(writer);
-                            }
-                        }
-                        System.out.println(customersList);
-                        break;
-                    case ("badCustomers"):
-                        try {
-                            int quantity = Integer.parseInt(entry.getValue());
-                            HashMap<Customer, Integer> customerQuantity = new HashMap<>();
-                            for (Customer customer : customerRepo.findAll()) {
-                                int cur = 0;
-                                for (Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())) {
-                                    cur += purchase.getQuantity();
-                                }
-                                customerQuantity.put(customer, cur);
-                            }
-                            customerQuantity.entrySet()
-                                    .stream()
-                                    .sorted(Map.Entry.comparingByValue())
-                                    .forEach(System.out::println);
-                            Iterator<Map.Entry<Customer,Integer>> iter = customerQuantity.entrySet().iterator();
+                Map.Entry<String, String> entry = iterator.next();
+                try {
+                    switch (entry.getKey()) {
+                        case ("lastName"):
+                            customersList = customerRepo.findBySurname(entry.getValue());
+                            System.out.println(customersList);
 
-                            for(int i = 0; i < quantity; i++){
-                                Map.Entry<Customer,Integer> e = iter.next();
-                                if(!customersList.contains(e.getKey())){
-                                    customersList.add(e.getKey());
-                                }else{
-                                    System.out.println("BAD QUANTITY VALUE");
-                                }
-                            }
+                            parameters.put("lastName", entry.getValue());
 
-                            parameters = new LinkedHashMap<>();
-                            parameters.put("badCustomers", String.valueOf(quantity));
                             printBeginCriteria(writer, parameters);
-                            for(Customer customer : customersList) {
-                                writer.beginObject();
-                                writer.name("last").value(customer.getName());
-                                writer.endObject();
-                            }
-                            printEndCritetia(writer);
+                            printCustomersList(writer, customersList);
+                            printEndCriteria(writer);
 
+                            break;
+                        case ("productName"):
+                            String title = entry.getValue();
 
-                        }catch (NumberFormatException e){
-
-                        }
-
-                        break;
-                    case ("startDate"):
-                        try {
-                            Date start = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
-                            if(iterator.hasNext()){
+                            if (iterator.hasNext()) {
                                 entry = iterator.next();
-                                Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue  ());
-                                for(Customer customer : customerRepo.findAll()){
-                                    parameters = new LinkedHashMap<>();
-                                    parameters.put("name", customer.getName());
+                                if (entry.getKey().equals("minTimes")) {
+                                    int minTimes = Integer.parseInt(entry.getValue());
+                                    Product product = productRepo.findByTitle(title);
+                                    customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
 
-                                    printBeginCriteria(writer,parameters);
-                                    System.out.println("start");
-                                    List<Purchase> purchaseList = new ArrayList<>();
-                                    purchaseList= purchaseRepo.findPurchasesBetweenDates(start,end);
-                                    System.out.println(purchaseList);
-                                    for(Purchase purchase: purchaseList){
-                                        writer.beginObject();
-                                        writer.name(purchase.getProduct().getProduct_title()).value(Math.round(purchase.getProduct().getPrice() * 100.0)/100.0);
-                                        writer.endObject();
+                                    parameters.put("productName", title);
+                                    parameters.put("minTimes", String.valueOf(minTimes));
+                                    printBeginCriteria(writer, parameters);
+                                    printCustomersList(writer, customersList);
+                                    printEndCriteria(writer);
+                                } else {
+                                    writer.nullValue();
+                                    printError("Wrong next argument for productName. Expected: minTimes, Received: " + entry.getKey());
+                                }
+                            } else {
+                                writer.nullValue();
+                                printError("Not all arguments for productName.");
+                            }
+                            System.out.println(customersList);
+                            break;
+                        case ("minExpenses"):
+                            try {
+                                int min = Integer.parseInt(entry.getValue());
+                                if (iterator.hasNext()) {
+                                    entry = iterator.next();
+                                    if (entry.getKey().equals("maxExpenses")) {
+
+                                        int max = Integer.parseInt(entry.getValue());
+                                        for (Customer DBCustomers : customerRepo.findAll()) {
+                                            int expenses = purchaseRepo.getAllExpenses(DBCustomers.getId_customer());
+                                            if (expenses > min && expenses < max)
+                                                customersList.add(DBCustomers);
+                                        }
+
+                                        parameters.put("minExpenses", String.valueOf(min));
+                                        parameters.put("maxExpenses", String.valueOf(max));
+                                        printBeginCriteria(writer, parameters);
+                                        printCustomersList(writer, customersList);
+                                        printEndCriteria(writer);
+
+                                    } else {
+                                        writer.nullValue();
+                                        printError("Wrong next argument for minExpenses. Expected: maxExpenses, Received: " + entry.getKey());
                                     }
-                                    printEndCritetia(writer);
+                                } else {
+                                    writer.nullValue();
+                                    printError("Not all arguments for minExpenses.");
+                                }
+                            } catch (NumberFormatException e) {
+                                writer.nullValue();
+                                printError("Wrong value for " + entry.getKey() + ". Expected: Number, Received: " + entry.getValue());
+                            }
+                            System.out.println(customersList);
+                            break;
+                        case ("badCustomers"):
+                            try {
+                                int quantity = Integer.parseInt(entry.getValue());
+                                HashMap<Customer, Integer> customerQuantity = new HashMap<>();
+                                for (Customer customer : customerRepo.findAll()) {
+                                    int cur = 0;
+                                    for (Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())) {
+                                        cur += purchase.getQuantity();
+                                    }
+                                    customerQuantity.put(customer, cur);
+                                }
+                                customerQuantity.entrySet()
+                                        .stream()
+                                        .sorted(Map.Entry.comparingByValue())
+                                        .forEach(System.out::println);
+                                Iterator<Map.Entry<Customer, Integer>> iter = customerQuantity.entrySet().iterator();
+
+                                for (int i = 0; i < quantity; i++) {
+                                    Map.Entry<Customer, Integer> e = iter.next();
+                                    if (!customersList.contains(e.getKey())) {
+                                        customersList.add(e.getKey());
+                                    } else {
+                                        System.out.println("BAD QUANTITY VALUE");
+                                    }
                                 }
 
+
+                                parameters.put("badCustomers", String.valueOf(quantity));
+                                printBeginCriteria(writer, parameters);
+                                printCustomersList(writer, customersList);
+                                printEndCriteria(writer);
+
+
+                            } catch (NumberFormatException e) {
+                                writer.nullValue();
+                                printError("Wrong value for badCustomers. Expected: Number, Received: " + entry.getValue());
                             }
-                        } catch (ParseException parseException){
-                                parseException.printStackTrace();
-                        }
+
                             break;
-                    default:
+                        case ("startDate"):
+                            try {
+                                Date start = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
+                                if (iterator.hasNext()) {
+                                    entry = iterator.next();
+                                    Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
+                                    for (Customer customer : customerRepo.findAll()) {
 
+                                        parameters.put("name", customer.getName());
+
+                                        printBeginCriteria(writer, parameters);
+                                        System.out.println("start");
+                                        List<Purchase> purchaseList = new ArrayList<>();
+                                        purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
+                                        System.out.println(purchaseList);
+                                        printPurchasesList(writer, purchaseList);
+                                        printEndCriteria(writer);
+                                    }
+
+                                }
+                            } catch (ParseException parseException) {
+                                writer.nullValue();
+                                printError("Wrong value for " + entry.getKey() + ". Expected: Date with format \"yyyy-MM-dd\", Received: " + entry.getValue());
+                            }
+                            break;
+                        default:
+
+                    }
+                } catch (NoResultException e) {
+                    System.out.println("NoResult");
                 }
-            }catch (NoResultException e){
-                System.out.println("NoResult");
             }
-        }
 
-        writer.endArray();
-        writer.endObject();
+            writer.endArray();
+            writer.endObject();
+        }
     }
 
 
@@ -292,7 +299,7 @@ public class Controller {
         writer.beginObject();
         writer.name("criteria");
         writer.beginObject();
-        for(Map.Entry<String,String> entry : criteria.entrySet()){
+        for (Map.Entry<String, String> entry : criteria.entrySet()) {
             writer.name(entry.getKey());
             writer.value(entry.getValue());
         }
@@ -301,16 +308,31 @@ public class Controller {
         writer.beginArray();
     }
 
-    private void printEndCritetia(JsonWriter writer) throws IOException {
+    private void printCustomersList(JsonWriter writer, List<Customer> customersList) throws IOException {
+        for (Customer customer : customersList) {
+            writer.beginObject();
+            writer.name("last").value(customer.getName());
+            writer.endObject();
+        }
+    }
+
+    private void printPurchasesList(JsonWriter writer, List<Purchase> purchaseList) throws IOException {
+        for (Purchase purchase : purchaseList) {
+            writer.beginObject();
+            writer.name(purchase.getProduct().getProduct_title()).value(Math.round(purchase.getProduct().getPrice() * 100.0) / 100.0);
+            writer.endObject();
+        }
+    }
+
+    private void printEndCriteria(JsonWriter writer) throws IOException {
         writer.endArray();
         writer.endObject();
     }
 
-    private void printError(JsonWriter writer, String message){
-        try {
-            writer.nullValue();
-            File out = new File("outFile\\out.json");
-            writer = new JsonWriter(new FileWriter(out));
+    private void printError(String message) {
+
+        File out = new File(homeDirectory + fileName);
+        try (JsonWriter writer = new JsonWriter(new FileWriter(out))) {
             writer.beginObject();
             writer.name("type");
             writer.value("error");
@@ -318,8 +340,9 @@ public class Controller {
             writer.value(message);
             writer.endObject();
             writer.close();
+            exit(0);
         } catch (IOException e) {
-            System.out.println("Every thing is bad");
+            e.printStackTrace();
         }
     }
 }
