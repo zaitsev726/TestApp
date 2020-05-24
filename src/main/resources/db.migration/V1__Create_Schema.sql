@@ -47,16 +47,20 @@ CREATE TABLE purchases
     FOREIGN KEY (id_product) REFERENCES  products(id_product) ON DELETE CASCADE
 );
 
-insert into customers values (1,'Агафонов', 'Константин');
-insert into customers values (2,'Белоусова', 'Виктория');
-insert into customers values (3,'Кудряшов', 'Роберт');
-insert into customers values (4,'Королёв', 'Дональд');
-insert into customers values (5,'Блинов', 'Роман');
-insert into customers values (6,'Логинова', 'Амира');
-insert into customers values (7,'Лобанова', 'Эжени');
-insert into customers values (8,'Шашкова', 'Триана');
-insert into customers values (9,'Ковалёв', 'Архип');
-insert into customers values (10,'Носков', 'Любомир');
+insert into customers(name, surname) values ('Константин','Агафонов');
+insert into customers(name, surname) values ('Виктория','Белоусова');
+insert into customers(name, surname) values ('Роберт','Кудряшов');
+insert into customers(name, surname) values ('Дональд','Королёв');
+insert into customers(name, surname) values ('Роман','Блинов');
+insert into customers(name, surname) values ('Амира','Логинова');
+insert into customers(name, surname) values ('Эжени','Лобанова');
+insert into customers(name, surname) values ('Триана','Шашкова');
+insert into customers(name, surname) values ('Архип','Ковалёв');
+
+insert into customers(name, surname) values ('Иван','Иванов');
+insert into customers(name, surname) values ('Владимир','Иванов');
+insert into customers(name, surname) values ('Александр','Блинов');
+insert into customers(name, surname) values ('Анастасия','Клолёва');
 
 insert into products(product_title, price) values ('Манго',64.90);
 insert into products(product_title, price) values ('Голубика',119.00);
@@ -79,6 +83,10 @@ insert into products(product_title, price) values ('Коктейль',229.00);
 insert into products(product_title, price) values ('Чай',55.99);
 insert into products(product_title, price) values ('Мыло',89.99);
 insert into products(product_title, price) values ('Шампунь',86.90);
+insert into products(product_title, price) values ('Минеральная вода',23.30);
+insert into products(product_title, price) values ('Газированная вода',89.90);
+insert into products(product_title, price) values ('Шоколад',46.75);
+insert into products(product_title, price) values ('Гречневая каша',18.30);
 
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (1,16,date '2020-03-25',3);
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (1,3,date '2020-03-25',6);
@@ -111,4 +119,25 @@ insert into purchases(id_customer, id_product, purchase_date,quantity) values (9
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,3,date '2020-03-03',4);
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,14,date '2020-03-03',6);
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,2,date '2020-03-03',6);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
+insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);
 insert into purchases(id_customer, id_product, purchase_date,quantity) values (10,8,date '2020-03-03',1);

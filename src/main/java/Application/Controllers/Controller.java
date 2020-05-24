@@ -14,9 +14,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -35,24 +36,30 @@ public class Controller {
     private PurchaseRepo purchaseRepo = new PurchaseRepo(emf);
     private ProductRepo productRepo = new ProductRepo(emf);
 
-    private String homeDirectory = "outFile\\";
+    private String homeDirectory = "src/outFile/";
     private String fileName = "out.json";
 
 
-    public Controller() throws IOException {
+    public Controller(String type, String inputFile, String outputFile) {
         currentParameters = new LinkedHashMap<>();
 
-        File f = new File(getClass().getClassLoader().getResource("10.json").getFile());
+        try (JsonReader reader = new JsonReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(inputFile), "UTF-8"))) {
+            handleObject(reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Something wrong with input file.");
+            exit(0);
+        } catch (NullPointerException n){
+            n.printStackTrace();
+            System.out.println("No such file.");
+        }
 
-        File file = new File("outFile\\out.json");
-        JsonReader reader = new JsonReader(new FileReader(f));
+        if (!outputFile.equals("") && !outputFile.equals(inputFile))
+            fileName = outputFile;
 
-
-        handleObject(reader);
-        search(file);
-
+        File out = new File(homeDirectory + fileName);
+        search(type, out);
         System.out.println("Done");
-
     }
 
     private void handleObject(JsonReader reader) throws IOException {
@@ -131,11 +138,11 @@ public class Controller {
         }
     }
 
-    public void search(File file) throws IOException {
-        try (JsonWriter writer = new JsonWriter(new FileWriter(file))) {
+    public void search(String type, File file) {
+        try (JsonWriter writer = new JsonWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.beginObject();
             writer.name("type");
-            writer.value("type_search_date");
+            writer.value(type);
 
             writer.name("results");
             writer.beginArray();
@@ -311,7 +318,7 @@ public class Controller {
                             if (iterator.hasNext()) {
                                 entry = iterator.next();
                                 Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
-                                if(start.getTime() < end.getTime()) {
+                                if (start.getTime() < end.getTime()) {
                                     for (Customer customer : customerRepo.findAll()) {
 
                                         parameters.put("name", customer.getName());
@@ -324,7 +331,7 @@ public class Controller {
                                         printPurchasesList(writer, purchaseList);
                                         printEndCriteria(writer);
                                     }
-                                }else {
+                                } else {
                                     writer.nullValue();
                                     printError("Wrong start Date. Expected startDate earlier endDate.");
                                 }
@@ -340,9 +347,13 @@ public class Controller {
                 }
 
             }
-
             writer.endArray();
             writer.endObject();
+
+        } catch (IOException e) {
+            System.out.println("Something wrong with output file.");
+            e.printStackTrace();
+            exit(0);
         }
     }
 
