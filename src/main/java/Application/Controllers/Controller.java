@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
@@ -145,63 +146,86 @@ public class Controller {
                 LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
 
                 Map.Entry<String, String> entry = iterator.next();
-                try {
-                    switch (entry.getKey()) {
-                        case ("lastName"):
-                            customersList = customerRepo.findBySurname(entry.getValue());
-                            System.out.println(customersList);
 
-                            parameters.put("lastName", entry.getValue());
+                switch (entry.getKey()) {
+                    case ("lastName"):
+                        customersList = customerRepo.findBySurname(entry.getValue());
+                        System.out.println(customersList);
 
-                            printBeginCriteria(writer, parameters);
-                            printCustomersList(writer, customersList);
-                            printEndCriteria(writer);
+                        parameters.put("lastName", entry.getValue());
 
-                            break;
-                        case ("productName"):
-                            String title = entry.getValue();
+                        printBeginCriteria(writer, parameters);
+                        printCustomersList(writer, customersList);
+                        printEndCriteria(writer);
 
-                            if (iterator.hasNext()) {
-                                entry = iterator.next();
-                                if (entry.getKey().equals("minTimes")) {
+                        break;
+                    case ("productName"):
+                        String title = entry.getValue();
+                        if (iterator.hasNext()) {
+                            entry = iterator.next();
+                            if (entry.getKey().equals("minTimes")) {
+                                try {
                                     int minTimes = Integer.parseInt(entry.getValue());
-                                    Product product = productRepo.findByTitle(title);
-                                    customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
+                                    Product product = null;
+                                    if (minTimes >= 0) {
+                                        try {
+                                            product = productRepo.findByTitle(title);
+                                        } catch (NoResultException e) {
+                                            parameters.put("productName", title);
+                                            printBeginCriteria(writer, parameters);
+                                            printEndCriteria(writer);
+                                            break;
+                                        }
+                                        customersList = purchaseRepo.findCustomerWithProductAndMoreQuantity(product.getId_product(), minTimes);
 
-                                    parameters.put("productName", title);
-                                    parameters.put("minTimes", String.valueOf(minTimes));
-                                    printBeginCriteria(writer, parameters);
-                                    printCustomersList(writer, customersList);
-                                    printEndCriteria(writer);
-                                } else {
+                                        parameters.put("productName", title);
+                                        parameters.put("minTimes", String.valueOf(minTimes));
+                                        printBeginCriteria(writer, parameters);
+                                        printCustomersList(writer, customersList);
+                                        printEndCriteria(writer);
+                                    } else {
+                                        writer.nullValue();
+                                        printError("Wrong argument for minTimes. Expected value greater than 0.");
+                                    }
+                                } catch (NumberFormatException e) {
                                     writer.nullValue();
-                                    printError("Wrong next argument for productName. Expected: minTimes, Received: " + entry.getKey());
+                                    printError("Wrong argument for minTimes. Expected: Number, Received: " + entry.getValue());
                                 }
                             } else {
                                 writer.nullValue();
-                                printError("Not all arguments for productName.");
+                                printError("Wrong next argument for productName. Expected: minTimes, Received: " + entry.getKey());
                             }
-                            System.out.println(customersList);
-                            break;
-                        case ("minExpenses"):
-                            try {
-                                int min = Integer.parseInt(entry.getValue());
+                        } else {
+                            writer.nullValue();
+                            printError("Not all arguments for productName.");
+                        }
+                        System.out.println(customersList);
+                        break;
+                    case ("minExpenses"):
+                        try {
+                            int min = Integer.parseInt(entry.getValue());
+                            if (min >= 0) {
                                 if (iterator.hasNext()) {
                                     entry = iterator.next();
                                     if (entry.getKey().equals("maxExpenses")) {
 
                                         int max = Integer.parseInt(entry.getValue());
-                                        for (Customer DBCustomers : customerRepo.findAll()) {
-                                            int expenses = purchaseRepo.getAllExpenses(DBCustomers.getId_customer());
-                                            if (expenses > min && expenses < max)
-                                                customersList.add(DBCustomers);
-                                        }
+                                        if (max > min) {
+                                            for (Customer DBCustomers : customerRepo.findAll()) {
+                                                int expenses = purchaseRepo.getAllExpenses(DBCustomers.getId_customer());
+                                                if (expenses > min && expenses < max)
+                                                    customersList.add(DBCustomers);
+                                            }
 
-                                        parameters.put("minExpenses", String.valueOf(min));
-                                        parameters.put("maxExpenses", String.valueOf(max));
-                                        printBeginCriteria(writer, parameters);
-                                        printCustomersList(writer, customersList);
-                                        printEndCriteria(writer);
+                                            parameters.put("minExpenses", String.valueOf(min));
+                                            parameters.put("maxExpenses", String.valueOf(max));
+                                            printBeginCriteria(writer, parameters);
+                                            printCustomersList(writer, customersList);
+                                            printEndCriteria(writer);
+                                        } else {
+                                            writer.nullValue();
+                                            printError("Bad argument for maxExpenses. Expected value greater than minExpenses.");
+                                        }
 
                                     } else {
                                         writer.nullValue();
@@ -211,16 +235,22 @@ public class Controller {
                                     writer.nullValue();
                                     printError("Not all arguments for minExpenses.");
                                 }
-                            } catch (NumberFormatException e) {
+                            } else {
                                 writer.nullValue();
-                                printError("Wrong value for " + entry.getKey() + ". Expected: Number, Received: " + entry.getValue());
+                                printError("Bad argument for minExpenses. Expected value greater than 0.");
                             }
-                            System.out.println(customersList);
-                            break;
-                        case ("badCustomers"):
-                            try {
-                                int quantity = Integer.parseInt(entry.getValue());
+                        } catch (NumberFormatException e) {
+                            writer.nullValue();
+                            printError("Wrong value for " + entry.getKey() + ". Expected: Number, Received: " + entry.getValue());
+                        }
+                        System.out.println(customersList);
+                        break;
+                    case ("badCustomers"):
+                        try {
+                            int quantity = Integer.parseInt(entry.getValue());
+                            if (quantity > 0) {
                                 HashMap<Customer, Integer> customerQuantity = new HashMap<>();
+                                LinkedList<Customer> linkedList = new LinkedList<>();
                                 for (Customer customer : customerRepo.findAll()) {
                                     int cur = 0;
                                     for (Purchase purchase : purchaseRepo.findByIdCustomer(customer.getId_customer())) {
@@ -228,19 +258,35 @@ public class Controller {
                                     }
                                     customerQuantity.put(customer, cur);
                                 }
-                                customerQuantity.entrySet()
+                           /* customerQuantity = customerQuantity.entrySet()
+                                    .stream()
+                                    .sorted(Map.Entry.comparingByValue())
+                                    .forEach(System.out::println);*/
+                                customerQuantity = customerQuantity.entrySet()
                                         .stream()
                                         .sorted(Map.Entry.comparingByValue())
-                                        .forEach(System.out::println);
-                                Iterator<Map.Entry<Customer, Integer>> iter = customerQuantity.entrySet().iterator();
+                                        .collect(Collectors.toMap(
+                                                Map.Entry::getKey,
+                                                Map.Entry::getValue,
+                                                (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 
-                                for (int i = 0; i < quantity; i++) {
+                                Iterator<Map.Entry<Customer, Integer>> iter = customerQuantity.entrySet().iterator();
+                                while (iter.hasNext()) {
                                     Map.Entry<Customer, Integer> e = iter.next();
-                                    if (!customersList.contains(e.getKey())) {
-                                        customersList.add(e.getKey());
-                                    } else {
-                                        System.out.println("BAD QUANTITY VALUE");
+                                    System.out.println(e.getKey() + "  " + e.getValue());
+                                }
+                                iter = customerQuantity.entrySet().iterator();
+                                for (int i = 0; i < quantity; i++) {
+                                    Map.Entry<Customer, Integer> e = null;
+                                    if (iter.hasNext())
+                                        e = iter.next();
+                                    else {
+                                        writer.nullValue();
+                                        printError("Wrong Quantity for badCustomers.");
+                                        break;
                                     }
+
+                                    customersList.add(e.getKey());
                                 }
 
 
@@ -249,44 +295,45 @@ public class Controller {
                                 printCustomersList(writer, customersList);
                                 printEndCriteria(writer);
 
-
-                            } catch (NumberFormatException e) {
+                            } else {
                                 writer.nullValue();
-                                printError("Wrong value for badCustomers. Expected: Number, Received: " + entry.getValue());
+                                printError("Wrong Quantity for badCustomers. Expected value greater than 0.");
                             }
+                        } catch (NumberFormatException e) {
+                            writer.nullValue();
+                            printError("Wrong value for badCustomers. Expected: Number, Received: " + entry.getValue());
+                        }
 
-                            break;
-                        case ("startDate"):
-                            try {
-                                Date start = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
-                                if (iterator.hasNext()) {
-                                    entry = iterator.next();
-                                    Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
-                                    for (Customer customer : customerRepo.findAll()) {
+                        break;
+                    case ("startDate"):
+                        try {
+                            Date start = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
+                            if (iterator.hasNext()) {
+                                entry = iterator.next();
+                                Date end = new SimpleDateFormat("yyyy-MM-dd").parse(entry.getValue());
+                                for (Customer customer : customerRepo.findAll()) {
 
-                                        parameters.put("name", customer.getName());
+                                    parameters.put("name", customer.getName());
 
-                                        printBeginCriteria(writer, parameters);
-                                        System.out.println("start");
-                                        List<Purchase> purchaseList = new ArrayList<>();
-                                        purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
-                                        System.out.println(purchaseList);
-                                        printPurchasesList(writer, purchaseList);
-                                        printEndCriteria(writer);
-                                    }
-
+                                    printBeginCriteria(writer, parameters);
+                                    System.out.println("start");
+                                    List<Purchase> purchaseList = new ArrayList<>();
+                                    purchaseList = purchaseRepo.findPurchasesBetweenDates(start, end);
+                                    System.out.println(purchaseList);
+                                    printPurchasesList(writer, purchaseList);
+                                    printEndCriteria(writer);
                                 }
-                            } catch (ParseException parseException) {
-                                writer.nullValue();
-                                printError("Wrong value for " + entry.getKey() + ". Expected: Date with format \"yyyy-MM-dd\", Received: " + entry.getValue());
-                            }
-                            break;
-                        default:
 
-                    }
-                } catch (NoResultException e) {
-                    System.out.println("NoResult");
+                            }
+                        } catch (ParseException parseException) {
+                            writer.nullValue();
+                            printError("Wrong value for " + entry.getKey() + ". Expected: Date with format \"yyyy-MM-dd\", Received: " + entry.getValue());
+                        }
+                        break;
+                    default:
+
                 }
+
             }
 
             writer.endArray();
